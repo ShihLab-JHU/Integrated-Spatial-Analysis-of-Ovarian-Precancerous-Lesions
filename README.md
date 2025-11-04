@@ -2,20 +2,7 @@
 
 This repository contains the R scripts and analysis code used in the study published at  
 **[BioRxiv (2025.06.24.661327v1)](https://www.biorxiv.org/content/10.1101/2025.06.24.661327v1)**
-
----
-### `scripts/`
-#### `1_STIC_Nanostring_preprocessing.Rmd`
-- Converts raw **WTA Nanostring data** into processed count data.  
-- **Note:** You do **not** need to run this step if starting from the dataset `GSM9005069`.
-
-#### `2_STIC_Nanostring_NMF.R`
-- Performs **Non-negative Matrix Factorization (NMF)** for molecular subtype classification.  
-- The resulting subtype information is stored in the `anno_data` column: Molecular_Subtype
-
-#### `3_STIC_Nanostring_analysis.Rmd`
-- Generates all main analyses and figures presented in the publication.  
-- Before running, please modify the root path in the script:  
+This repository accompanies the preprint version on BioRxiv and will be updated upon journal publication
 
 ------------------------------------------------------------
 

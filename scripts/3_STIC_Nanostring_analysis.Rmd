@@ -735,16 +735,6 @@ res_list <- setNames(
 
 
 ## Extract top50 genes from different classes
-unique_contrasts <- c("NFT_unique", "Mixed_unique", "Proliferative_unique",
-                      "Dormant_unique", "Immunoreactive_unique", "HGSC_unique")
-results_list <- list(
-  NFT_unique = NFT_unique,
-  Mixed_unique = Mixed_unique,
-  Proliferative_unique = Proliferative_unique,
-  Dormant_unique = Dormant_unique,
-  Immunoreactive_unique = Immunoreactive_unique,
-  HGSC_unique = HGSC_unique
-)
 
 unique_all <- c(
   "NFT_unique_all","Mixed_unique_all","Proliferative_unique_all",
@@ -755,8 +745,8 @@ top50_unique <- lapply(res_list[unique_all], function(tab) head(tab, 50))
 genes_top <- unique(unlist(lapply(top50_unique, rownames)))
 
 # optional matrices if you need them later
-top_50_count_data   <- count_data_combined[genes_top, , drop = FALSE]
-high_var_count_data <- count_data_combined[apply(count_data_combined, 1, var, na.rm = TRUE) > 0.9, , drop = FALSE]
+top_50_count_data   <- count_data.epi[genes_top, , drop = FALSE]
+high_var_count_data <- count_data.epi[apply(count_data.epi, 1, var, na.rm = TRUE) > 0.9, , drop = FALSE]
 
 ```
 
@@ -785,8 +775,8 @@ volcano_specs <- list(
   list(coef="Mixed_unique_STIC",         t1="Mixed STIC",         t2="Others",
        genes=c("MMP7","CP","CFB","MUC1","MUC16","MT1E","HLA-DRA","HLA-DRB1","HLA-DPB1",
                "HLA-E","CXCL2","C3","CD74","CD9","CD24","TCIM","IFI27","H1-5","H1-4",
-               "H1-2","MT1X","CDK16","SOX4","SOX17","CLDN3","RPN1","FTH1","CRISP3",
-               "PAX2","CDH4","SOX3","PRR23D2","HOXA3","FAM90A1","CHRNA4","PAX2"),
+               "H1-2","MT1X","CDK16","SOX4","SOX17","CLDN3","RPN1","FTH1", "COL6A2", 
+               "CDH4","PRR23D2","HOXA3","FAM90A1","CHRNA4", "PLEKHH2"),
        file="Mixed_unique_STIC"),
   list(coef="Immunoreactive_unique_STIC",t1="Immunoreactive STIC",t2="Others",
        genes=c("HLA-DRA","HLA-DRB1","HLA-DPB1","HLA-DPA1","HLA-E","HLA-B","HLA-DMA",
@@ -1491,7 +1481,7 @@ combined_plot <- arrangeGrob(plot1, plot2, nrow = 2)
 
 
 ggsave(
-  filename = paste0(directory, "/NMF/NO_NFT_HGSC/Cluster4/combine_plot_chr.png"),
+  filename = paste0(root, "/outputs/figures/combine_plot_chr.png"),
   plot = combined_plot,
   width = 16,
   height = 4.8,
@@ -1526,7 +1516,7 @@ final_plot <- plot_grid(
 print(final_plot)
 
 ggsave(
-  filename = paste0(directory, "/NMF/NO_NFT_HGSC/Cluster4/chr_all_combine_legend.png"),
+  filename = paste0(root, "/outputs/figures/chr_all_combine_legend.png"),
   plot = final_plot,
   width = 16,
   height = 4.8,
@@ -1562,7 +1552,7 @@ Stromal_lymphocyte_colors <- c(
 annotation_colors <- list(
   "Morphology diagnosis" = diagnosis_colors,
   'p53 pattern' = p53_colors,
-  'Stromal lymphocytes' = TIL2_colors,
+  'Stromal lymphocytes' = Stromal_lymphocyte_colors,
   'Molecular Subtype' = cluster_colors 
 )
 
@@ -1623,34 +1613,33 @@ Heatmap(
   heatmap_legend_param = list(title = "Expression", at = seq(-3.5, 3.5, by = 1))
 )
 
-# # Save Heatmap
-# png(filename = paste0(directory, "/NMF/NO_NFT_HGSC/Cluster4/heatmap_molecular.png"), width =6400, height = 3200, res = 300)
-# 
-# ht <- Heatmap(
-#   scaled_genes,
-#   name = "Scaled\nExpression",
-#   col = col_fun,
-#   cluster_rows = TRUE,
-#   cluster_columns = FALSE,
-#   show_row_names = FALSE,
-#   show_column_names = FALSE,
-#   top_annotation = ha,
-#   # Facet columns by Molecular Subtype
-#   column_split = annotation_ordered$Molecular_Subtype,
-#   # Increase font size and optionally make it bold
-#   column_title_gp = gpar(fontsize = 18, fontface = "bold"),
-#   # Optional: control the heatmap legend fonts
-#   heatmap_legend_param = list(
-#     title = "Expression", 
-#     at = seq(-3.5, 3.5, by = 1),
-#     title_gp = gpar(fontsize = 16, fontface = "bold"),
-#     labels_gp = gpar(fontsize = 16)
-#   )
-# )
-# 
-# # Draw the heatmap
-# draw(ht)
-# dev.off()
+# Save Heatmap
+png(filename = paste0(root, "/outputs/figures/heatmap_molecular.png"), width =6400, height = 3200, res = 300)
+ht <- Heatmap(
+ scaled_genes,
+ name = "Scaled\nExpression",
+ col = col_fun,
+ cluster_rows = TRUE,
+ cluster_columns = FALSE,
+ show_row_names = FALSE,
+ show_column_names = FALSE,
+ top_annotation = ha,
+ # Facet columns by Molecular Subtype
+ column_split = annotation_ordered$Molecular_Subtype,
+ # Increase font size and optionally make it bold
+ column_title_gp = gpar(fontsize = 18, fontface = "bold"),
+ # Optional: control the heatmap legend fonts
+ heatmap_legend_param = list(
+   title = "Expression", 
+   at = seq(-3.5, 3.5, by = 1),
+   title_gp = gpar(fontsize = 16, fontface = "bold"),
+   labels_gp = gpar(fontsize = 16)
+ )
+)
+
+# Draw the heatmap
+draw(ht)
+dev.off()
 ```
 
 ### Heatmap epithelium original (Supplemental Figure 1A)
@@ -1658,7 +1647,7 @@ Heatmap(
 # palettes (add stromal if not defined)
 diagnosis_colors <- c("NFT"="#1f77b4","p53"="lightblue","STIC"="orange","HGSC"="#d62728")
 p53_colors <- c("loss"="#d9d9d9","overexpression"="brown","wildtype"="lightblue")
-Stromal_lymphocyte_colors <- c("Non-enriched"="#f7fcf0","Enriched"="#74c476")  # <- consistent name
+Stromal_lymphocyte_colors <- c("Non-enriched"="#f7fcf0","Enriched"="#74c476")
 
 # use same matrices you already made
 filtered_genes_var <- high_var_count_data[, row.names(anno_data.epi)]
@@ -1671,7 +1660,6 @@ col_fun <- colorRamp2(seq(-3, 3, length.out = 200),
 anno_data.epi$p53_plot <- dplyr::case_when(
   is.na(anno_data.epi$p53_pattern)           ~ "wildtype",
   anno_data.epi$p53_pattern == "wild type"   ~ "wildtype",
-  anno_data.epi$p53_pattern == "mosaic"      ~ "overexpression",
   TRUE                                       ~ as.character(anno_data.epi$p53_pattern)
 )
 anno_data.epi$p53_plot <- factor(anno_data.epi$p53_plot,
@@ -1680,7 +1668,7 @@ anno_data.epi$p53_plot <- factor(anno_data.epi$p53_plot,
 # --- top annotation (use consistent stromal name & new p53_plot) ---
 ha2 <- HeatmapAnnotation(
   Diagnosis             = anno_data.epi$Diagnosis,
-  `Stromal lymphocyte`  = anno_data.epi$Stromal_lymphocyte,  # make sure this column is named exactly like this in your data
+  `Stromal lymphocyte`  = anno_data.epi$Stromal_lymphocyte,  
   `p53 pattern`         = anno_data.epi$p53_plot,
   col = list(
     Diagnosis            = diagnosis_colors,
@@ -1711,7 +1699,7 @@ ht2 <- Heatmap(
   )
 )
 
-png(file.path(directory, "NMF/NO_NFT_HGSC/Cluster4/heatmap_original.png"),
+png(file.path(root, "outputs/figures/heatmap_original.png"),
     width = 6400, height = 3200, res = 300)
 draw(ht2)
 dev.off()
@@ -1782,15 +1770,15 @@ ht_stroma <- Heatmap(
 )
 
 print(ht_stroma)
-# # Save to PNG
-# png(
-#   filename = file.path(directory, "NMF/NO_NFT_HGSC/Cluster4/heatmap_stroma.png"),
-#   width    = 6400,
-#   height   = 3200,
-#   res      = 300
-# )
-# draw(ht_stroma)
-# dev.off()
+# Save to PNG
+png(
+ filename = file.path(root, "outputs/figures/heatmap_stroma.png"),
+ width    = 6400,
+ height   = 3200,
+ res      = 300
+)
+draw(ht_stroma)
+dev.off()
 ```
 
 
@@ -2048,7 +2036,7 @@ pca_3d_plot <- pca_3d_plot %>%
 
 ## Molecular distance (Figure 1E, 1F)
 ```{r message=FALSE, warning=FALSE}
-output_dir <- file.path(root,"figures/01_molecular_distance")
+output_dir <- file.path(root,"outputs/figures/01_molecular_distance")
 anno_data.epimeso <- anno_data %>%
   filter(type %in% c("mesothelium", "epithelium")) %>%
   filter(!Diagnosis %in% c("EC", "CCC"))
@@ -2220,8 +2208,8 @@ P_dist<- ggplot(df_3ref_long, aes(x = Molecular_Subtype, y = Distance, fill = Mo
       axis.title = element_text(size = 14)
     )
 
-#ggsave(filename = paste0(directory, "/NMF/NO_NFT_HGSC/Cluster4/Molecular_distance_re.png"),
-#         plot = P_dist, width = 6, height = 4, dpi = 300)
+ggsave(filename = paste0(output_dir, "/Molecular_distance_re.png"),
+         plot = P_dist, width = 6, height = 4, dpi = 300)
 
 
 ############################3D
@@ -2267,7 +2255,7 @@ distance_3d_plot <- plot_ly(
             textposition = "center",
             textfont = list(
               size = 16,
-              color = dark_cluster_colors[as.character(centers_pca_3d$`Molecular Subtype`)]
+              color = dark_cluster_colors[as.character(centers_md_3d$`Molecular Subtype`)]
             )
   )%>%
   layout(
@@ -2385,7 +2373,7 @@ p1 <- plot_DE_list2(HGSCvsSTIC, title_1 = "HGSC", title_2 = "STIC (Stroma)", gen
     axis.text.y = element_text(size = 12),   # Adjust y-axis text size
     axis.title = element_text(size = 14),  # Adjust axis title size
   ) 
-ggsave(filename = paste0(root, "/output/figures/02_sup_stroma/Stroma_HGSC_STIC.png"), plot = p1, width = 6, height = 6, dpi = 300)
+ggsave(filename = paste0(root, "/outputs/figures/02_sup_stroma/Stroma_HGSC_STIC.png"), plot = p1, width = 6, height = 6, dpi = 300)
 ```
 ### Stroma pathway (Supplemental Figure 2B)
 ```{r}
